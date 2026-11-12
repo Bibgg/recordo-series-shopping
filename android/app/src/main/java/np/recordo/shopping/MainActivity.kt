@@ -73,7 +73,7 @@ private fun RecordoApp(){
     }
     item{OutlinedTextField(search,{search=it},Modifier.fillMaxWidth(),placeholder={Text("सामान खोज्नुहोस्")},leadingIcon={Icon(Icons.Default.Search,null)},singleLine=true)}
     item{Text("श्रेणी",fontWeight=FontWeight.Bold);Column{categories.chunked(3).forEach{group->Row{group.forEach{c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}}}}
-    item{Text(message);if(busy)LinearProgressIndicator(Modifier.fillMaxWidth());TextButton(onClick={load}){Text("Refresh")}}
+    item{Text(message);if(busy)LinearProgressIndicator(Modifier.fillMaxWidth());TextButton(onClick={load()}){Text("Refresh")}}
     items(shown,key={it.id}){p->
      ElevatedCard(Modifier.fillMaxWidth()){Row(Modifier.fillMaxWidth().padding(14.dp),horizontalArrangement=Arrangement.SpaceBetween){
       Column(Modifier.weight(1f)){Text(p.name,fontWeight=FontWeight.SemiBold);Text(p.category);Text("रु ${"%,d".format(p.price_npr)} / ${p.unit}");Text("स्टक: ${p.stock_quantity}")}
