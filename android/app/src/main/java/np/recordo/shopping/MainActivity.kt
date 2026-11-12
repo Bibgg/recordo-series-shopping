@@ -21,7 +21,8 @@ class MainActivity:ComponentActivity(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecordoApp(){
- var products by remember{mutableStateOf<List<ProductDto>>(emptyList())}\n var pickupAreas by remember{mutableStateOf<List<PickupAreaDto>>(emptyList())}
+ var products by remember{mutableStateOf<List<ProductDto>>(emptyList())}
+ var pickupAreas by remember{mutableStateOf<List<PickupAreaDto>>(emptyList())}
  var search by remember{mutableStateOf("")}
  var category by remember{mutableStateOf("All")}
  var cart by remember{mutableStateOf<Map<String,Int>>(emptyMap())}

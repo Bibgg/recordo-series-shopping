@@ -4,7 +4,14 @@ plugins {
  id("org.jetbrains.kotlin.plugin.compose")
 }
 val apiBaseUrl=providers.gradleProperty("API_BASE_URL").orElse("http://10.0.2.2:8000/").get()
-android {\n compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }\n kotlinOptions { jvmTarget = "17" }
+android {
+ compileOptions {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+ }
+ kotlinOptions {
+  jvmTarget = "17"
+ }
  namespace="np.recordo.shopping"
  compileSdk=35
  defaultConfig {
