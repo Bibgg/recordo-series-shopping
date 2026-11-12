@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.env
+.gradle/
+**/build/
+local.properties
+*.jks
+*.keystore
+.idea/
+.vscode/
+.DS_Store
