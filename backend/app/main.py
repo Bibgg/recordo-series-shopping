@@ -113,6 +113,9 @@ class OrderStatusUpdate(BaseModel):
 
 ALLOWED_STATUSES = {"confirmed", "packed", "dispatched", "delivered", "cancelled"}
 
+from .logistics import router as logistics_router
+app.include_router(logistics_router)
+
 @app.get("/health")
 def health():
     return {"ok": True, "service": "recordo-nepal-api", "country": "NP", "currency": "NPR"}
