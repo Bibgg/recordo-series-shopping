@@ -21,7 +21,7 @@ class MainActivity:ComponentActivity(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecordoApp(){
- var products by remember{mutableStateOf<List<ProductDto>>(emptyList())}
+ var products by remember{mutableStateOf<List<ProductDto>>(emptyList())}\n var pickupAreas by remember{mutableStateOf<List<PickupAreaDto>>(emptyList())}
  var search by remember{mutableStateOf("")}
  var category by remember{mutableStateOf("All")}
  var cart by remember{mutableStateOf<Map<String,Int>>(emptyMap())}
@@ -38,7 +38,7 @@ private fun RecordoApp(){
  fun load(){
   scope.launch{
    busy=true
-   try{products=ApiClient.service.products();message=if(products.isEmpty())"अहिले सामान छैन। Admin बाट सामान थप्नुहोस्।" else "नेपालका सामान उपलब्ध छन्"}
+   try{products=ApiClient.service.products();pickupAreas=ApiClient.service.pickupAreas();message=if(products.isEmpty())"अहिले सामान छैन। Admin बाट सामान थप्नुहोस्।" else "नेपालका सामान उपलब्ध छन्"}
    catch(e:Exception){message="Server जोडिएन। API URL जाँच्नुहोस्।"}
    finally{busy=false}
   }
@@ -51,6 +51,25 @@ private fun RecordoApp(){
   Scaffold(topBar={TopAppBar(title={Column{Text("Recordo Nepal",fontWeight=FontWeight.Bold);Text("नेपालमै किनमेल र डेलिभरी",fontSize=12.sp)}})}){padding->
    LazyColumn(Modifier.fillMaxSize().padding(padding),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)){
     item{Text("नमस्ते! स्वागत छ 🇳🇵",fontSize=23.sp,fontWeight=FontWeight.Bold);Text("आफ्नो गाउँ र नजिकका ठाउँमा सामान मगाउनुहोस्")}
+    item{
+     Text("Pickup Collection",fontWeight=FontWeight.Bold,fontSize=20.sp)
+     Text("आफ्नो सामानको क्षेत्रअनुसार अर्डर जम्मा हुँदैछ",fontSize=12.sp,color=MaterialTheme.colorScheme.onSurfaceVariant)
+     if(pickupAreas.isEmpty()){Text("अहिले Pickup क्षेत्रमा अर्डर छैन।")}
+     pickupAreas.forEach{area->
+      ElevatedCard(Modifier.fillMaxWidth()){
+       Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){
+         Text(area.pickup_area,fontWeight=FontWeight.Bold)
+         AssistChip(onClick={},label={Text(if(area.ready_for_pickup)"Pickup तयार" else "जम्मा हुँदैछ")})
+        }
+        Text("${area.ready_orders} / ${area.target_orders} अर्डर")
+        LinearProgressIndicator(progress={area.progress_percent/100f},modifier=Modifier.fillMaxWidth())
+        Text(if(area.ready_for_pickup)"Pickup लक्ष्य पूरा भयो।" else "${area.remaining_orders} अर्डर बाँकी",fontSize=12.sp)
+        Text("स्थिति: ${area.batch_status}",fontSize=12.sp)
+       }
+      }
+     }
+    }
     item{OutlinedTextField(search,{search=it},Modifier.fillMaxWidth(),placeholder={Text("सामान खोज्नुहोस्")},leadingIcon={Icon(Icons.Default.Search,null)},singleLine=true)}
     item{Text("श्रेणी",fontWeight=FontWeight.Bold);Column{categories.chunked(3).forEach{group->Row{group.forEach{c->FilterChip(selected=category==c,onClick={category=c},label={Text(c)})}}}}}
     item{Text(message);if(busy)LinearProgressIndicator(Modifier.fillMaxWidth());TextButton(onClick={load}){Text("Refresh")}}

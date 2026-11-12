@@ -27,6 +27,7 @@ class ProductRow(Base):
     price_npr: Mapped[int] = mapped_column(Integer, nullable=False)
     unit: Mapped[str] = mapped_column(String(40), default="piece")
     stock_quantity: Mapped[int] = mapped_column(Integer, default=0)
+    pickup_area: Mapped[str] = mapped_column(String(120), default="Baglung")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
@@ -55,6 +56,7 @@ class OrderItemRow(Base):
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     unit_price_npr: Mapped[int] = mapped_column(Integer, nullable=False)
     line_total_npr: Mapped[int] = mapped_column(Integer, nullable=False)
+    pickup_area: Mapped[str] = mapped_column(String(120), default="Baglung")
     order: Mapped[OrderRow] = relationship(back_populates="items")
 
 Base.metadata.create_all(bind=engine)
@@ -93,6 +95,7 @@ class ProductCreate(BaseModel):
     price_npr: int = Field(gt=0, le=100000000)
     unit: str = Field(default="piece", max_length=40)
     stock_quantity: int = Field(ge=0, le=1000000)
+    pickup_area: str = Field(default="Baglung", min_length=2, max_length=120)
 
 class OrderLineInput(BaseModel):
     product_id: str
@@ -114,7 +117,9 @@ class OrderStatusUpdate(BaseModel):
 ALLOWED_STATUSES = {"confirmed", "packed", "dispatched", "delivered", "cancelled"}
 
 from .logistics import router as logistics_router
+from .pickup import router as pickup_router
 app.include_router(logistics_router)
+app.include_router(pickup_router)
 
 @app.get("/health")
 def health():
@@ -140,7 +145,7 @@ def products(category: str | None = Query(default=None), db: Session = Depends(g
     rows = db.scalars(query).all()
     return [{"id": p.id, "name": p.name, "description": p.description,
              "category": p.category, "price_npr": p.price_npr, "currency": "NPR",
-             "unit": p.unit, "stock_quantity": p.stock_quantity} for p in rows]
+             "unit": p.unit, "stock_quantity": p.stock_quantity, "pickup_area": p.pickup_area} for p in rows]
 
 @app.post("/api/v1/admin/products", status_code=201)
 def add_product(payload: ProductCreate, _: None = Depends(require_admin), db: Session = Depends(get_db)):
@@ -189,6 +194,7 @@ def create_order(payload: OrderCreate, db: Session = Depends(get_db)):
             order.items.append(OrderItemRow(
                 product_id=product.id, product_name=product.name, quantity=quantity,
                 unit_price_npr=product.price_npr, line_total_npr=line_total,
+                pickup_area=product.pickup_area,
             ))
         order.total_npr = total
         db.add(order)
