@@ -44,7 +44,9 @@ class BatchCreate(BaseModel):
 class BatchStatusUpdate(BaseModel):
     status: str
 
-Base.metadata.create_all(bind=engine)\n\nBATCH_STATES = {"pickup_scheduled", "picked_up", "at_sorting_center", "sorted", "dispatched", "completed", "cancelled"}
+Base.metadata.create_all(bind=engine)
+
+BATCH_STATES = {"pickup_scheduled", "picked_up", "at_sorting_center", "sorted", "dispatched", "completed", "cancelled"}
 
 def _area_counts(db: Session):
     rows = db.execute(
