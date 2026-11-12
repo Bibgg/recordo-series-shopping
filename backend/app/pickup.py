@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, select, func
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from .main import Base, OrderRow, OrderItemRow, get_db, require_admin
+from .main import Base, OrderRow, OrderItemRow, engine, get_db, require_admin
 
 router = APIRouter(prefix="/api/v1", tags=["pickup-collection"])
 DEFAULT_THRESHOLD = int(os.getenv("PICKUP_ORDER_THRESHOLD", "50"))
